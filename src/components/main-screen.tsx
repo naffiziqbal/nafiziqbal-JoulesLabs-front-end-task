@@ -17,6 +17,7 @@ import { useCallback, useRef, useState } from "react";
 import { NODE_TEMPLATES } from "../data/data";
 import { v4 as uuidv4 } from "uuid";
 import useSaveToLocal from "../hooks/useSaveToLocal";
+import useLoadFromStorage from "../hooks/useLoadFromStorage";
 
 export default function MainScreen() {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -74,6 +75,7 @@ export default function MainScreen() {
   );
 
   useSaveToLocal({ nodes, edges, rfInstance });
+  useLoadFromStorage({ setNodes, setEdges });
 
   return (
     <div
