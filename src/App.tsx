@@ -10,7 +10,7 @@ export default function App() {
   return (
     <div className="grid grid-cols-[20%_60%_20%]">
       <SideBar />
-      <MainScreen setSelected={setSelected} />
+      <MainScreen selected={selected} setSelected={setSelected} />
       <RightBar selected={selected} />
     </div>
   );

@@ -18,10 +18,13 @@ import { v4 as uuidv4 } from "uuid";
 import useSaveToLocal from "../hooks/useSaveToLocal";
 import useLoadFromStorage from "../hooks/useLoadFromStorage";
 import useRestoreViewport from "../hooks/useRestoreViewport";
+import useDeleteNode from "../hooks/useDeleteNode";
 
 export default function MainScreen({
+  selected,
   setSelected,
 }: {
+  selected: Node | null;
   setSelected: (node: Node | null) => void;
 }) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -84,6 +87,7 @@ export default function MainScreen({
   useSaveToLocal({ nodes, edges, rfInstance });
   useLoadFromStorage({ setNodes, setEdges });
   useRestoreViewport({ rfInstance });
+  useDeleteNode({ selected, setNodes, setEdges, setSelected });
 
   return (
     <div
