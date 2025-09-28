@@ -16,6 +16,7 @@ import "@xyflow/react/dist/style.css";
 import { useCallback, useRef, useState } from "react";
 import { NODE_TEMPLATES } from "../data/data";
 import { v4 as uuidv4 } from "uuid";
+import useSaveToLocal from "../hooks/useSaveToLocal";
 
 export default function MainScreen() {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -34,6 +35,7 @@ export default function MainScreen() {
       if (!wrapperRef.current) return;
       console.log(nodes);
       const type = event.dataTransfer.getData("application/reactflow");
+      console.log(type);
       if (!type) return;
       const template = NODE_TEMPLATES.find((t) => t.type === type);
       const reactFlowBounds = wrapperRef.current.getBoundingClientRect();
@@ -70,6 +72,8 @@ export default function MainScreen() {
     },
     [edges, setEdges]
   );
+
+  useSaveToLocal({ nodes, edges, rfInstance });
 
   return (
     <div
