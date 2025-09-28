@@ -7,6 +7,7 @@ import {
   Controls,
   Background,
   BackgroundVariant,
+  MiniMap,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 const initialNodes = [
@@ -44,8 +45,10 @@ export default function MainScreen() {
         onConnect={onConnect}
         fitView
       >
-        <Background variant={BackgroundVariant.Lines} />
+        <Background variant={BackgroundVariant.Dots} bgColor="#212121" />
         <Controls />
+        <MiniMap />
+    
       </ReactFlow>
     </div>
   );
