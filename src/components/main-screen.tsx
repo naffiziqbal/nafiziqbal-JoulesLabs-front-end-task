@@ -3,7 +3,6 @@ import {
   Background,
   BackgroundVariant,
   Controls,
-  MiniMap,
   ReactFlow,
   useEdgesState,
   useNodesState,
@@ -20,7 +19,13 @@ import useSaveToLocal from "../hooks/useSaveToLocal";
 import useLoadFromStorage from "../hooks/useLoadFromStorage";
 import useRestoreViewport from "../hooks/useRestoreViewport";
 
-export default function MainScreen() {
+export default function MainScreen({
+  selected,
+  setSelected,
+}: {
+  selected: Node | null;
+  setSelected: (node: Node | null) => void;
+}) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([] as Node[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([] as Edge[]);
@@ -74,6 +79,9 @@ export default function MainScreen() {
     },
     [edges, setEdges]
   );
+  const onNodeClick = useCallback((_: any, node: Node) => {
+    setSelected(node);
+  }, []);
 
   useSaveToLocal({ nodes, edges, rfInstance });
   useLoadFromStorage({ setNodes, setEdges });
@@ -92,6 +100,7 @@ export default function MainScreen() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onNodeClick={onNodeClick}
         fitView
       >
         <Background variant={BackgroundVariant.Dots} bgColor="#212121" />
