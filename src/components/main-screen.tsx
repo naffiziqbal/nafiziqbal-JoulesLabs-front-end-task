@@ -20,10 +20,8 @@ import useLoadFromStorage from "../hooks/useLoadFromStorage";
 import useRestoreViewport from "../hooks/useRestoreViewport";
 
 export default function MainScreen({
-  selected,
   setSelected,
 }: {
-  selected: Node | null;
   setSelected: (node: Node | null) => void;
 }) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
