@@ -1,7 +1,11 @@
 import { NODE_TEMPLATES } from "../data/data";
 import type { NodeType } from "../types/types";
 
-export default function SideBar() {
+export default function SideBar({
+  handleExport,
+}: {
+  handleExport: () => void;
+}) {
   return (
     <div className="bg-white p-3 space-y-4">
       <h4 className="font-bold text-lg">Nodes</h4>
@@ -10,6 +14,12 @@ export default function SideBar() {
           <PaletteItem key={t.type} template={t} />
         ))}
       </div>
+      <button
+        className="bg-blue-500 text-white px-4 py-2 rounded"
+        onClick={handleExport}
+      >
+        Export
+      </button>
     </div>
   );
 }

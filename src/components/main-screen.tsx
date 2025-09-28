@@ -4,11 +4,11 @@ import {
   BackgroundVariant,
   Controls,
   ReactFlow,
-  useEdgesState,
-  useNodesState,
   type Connection,
   type Edge,
   type Node,
+  type NodeChange,
+  type EdgeChange,
   type ReactFlowInstance,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
@@ -24,14 +24,28 @@ import ConfigModal from "./edit-modal";
 export default function MainScreen({
   selected,
   setSelected,
+  nodes,
+  setNodes,
+  edges,
+  setEdges,
+  onNodesChange,
+  onEdgesChange,
+  rfInstance,
+  setRfInstance,
 }: {
   selected: Node | null;
   setSelected: (node: Node | null) => void;
+  nodes: Node[];
+  setNodes: (nodes: Node[]) => void;
+  edges: Edge[];
+  setEdges: (edges: Edge[]) => void;
+  onNodesChange: (changes: NodeChange[]) => void;
+  onEdgesChange: (changes: EdgeChange[]) => void;
+  rfInstance: ReactFlowInstance | null;
+  setRfInstance: (rfInstance: ReactFlowInstance | null) => void;
 }) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
-  const [nodes, setNodes, onNodesChange] = useNodesState([] as Node[]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([] as Edge[]);
-  const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
+
   const [editingNode, setEditingNode] = useState<Node | null>(null);
 
   const onDragOver = useCallback((event: React.DragEvent) => {

@@ -39,12 +39,15 @@ export function toReactFlowNodes(nodes: FlowNode[]): Node[] {
   }));
 }
 
-
 export function toReactFlowEdges(edges: FlowEdge[]): Edge[] {
-    return edges.map((e) => ({
-      id: e.id,
-      source: e.from.nodeId,
-      target: e.to.nodeId,
-      animated: true,
-    }));
-  }
+  return edges.map((e) => ({
+    id: e.id,
+    source: e.from.nodeId,
+    target: e.to.nodeId,
+    animated: true,
+  }));
+}
+
+export function exportToJSON(flow: FlowState) {
+  return JSON.stringify(flow, null, 2);
+}
