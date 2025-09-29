@@ -3,8 +3,18 @@ import type { NodeType } from "../types/types";
 
 export default function SideBar({
   handleExport,
+  handleImportClick,
+  importError,
+  exportError,
+  fileRef,
+  handleFile,
 }: {
   handleExport: () => void;
+  handleImportClick: () => void;
+  importError: string | null;
+  exportError: string | null;
+  fileRef: React.RefObject<HTMLInputElement | null>;
+  handleFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
     <div className="bg-white p-3 space-y-4">
@@ -14,12 +24,29 @@ export default function SideBar({
           <PaletteItem key={t.type} template={t} />
         ))}
       </div>
+      <div className="space-y-2">
+        <input
+          ref={fileRef}
+          type="file"
+          accept="application/json"
+          className="hidden"
+          onChange={handleFile}
+        />
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+          onClick={handleImportClick}
+        >
+          Import
+        </button>
+      </div>
       <button
         className="bg-blue-500 text-white px-4 py-2 rounded"
         onClick={handleExport}
       >
         Export
       </button>
+      {importError && <div className="text-red-500">{importError}</div>}
+      {exportError && <div className="text-red-500">{exportError}</div>}
     </div>
   );
 }
