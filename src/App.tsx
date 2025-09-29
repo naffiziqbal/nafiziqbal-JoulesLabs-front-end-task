@@ -30,6 +30,7 @@ export default function App() {
   const [importError, setImportError] = useState<string | null>(null);
   const [exportError, setExportError] = useState<string | null>(null);
 
+  console.log(importError);
   const handleFile = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const f = e.target.files?.[0];
@@ -38,10 +39,12 @@ export default function App() {
       reader.onload = () => {
         try {
           const parsed = JSON.parse(String(reader.result));
-          if (!validateImported(parsed))
-            throw new Error(
-              "Invalid flow structure. Missing nodes[], edges[] or viewport."
+          if (!validateImported(parsed)) {
+            setImportError(
+              "Invalid flow structure. Missing nodes[], edges[] or viewport"
             );
+            return;
+          }
           setNodes(toReactFlowNodes(parsed.nodes));
           setEdges(toReactFlowEdges(parsed.edges));
           // store viewport to apply once rfInstance available

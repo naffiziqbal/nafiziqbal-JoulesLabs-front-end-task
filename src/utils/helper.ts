@@ -21,12 +21,46 @@ export function fromReactFlowEdges(edges: Edge[]): FlowEdge[] {
   }));
 }
 
-export function validateImported(obj: any): obj is FlowState {
-  if (!obj || typeof obj !== "object") return false;
-  if (obj.version == null) return false;
-  if (!Array.isArray(obj.nodes)) return false;
-  if (!Array.isArray(obj.edges)) return false;
-  if (!obj.viewport || typeof obj.viewport !== "object") return false;
+export function validateImported(obj: unknown): obj is {
+  version: number;
+  nodes: FlowNode[];
+  edges: FlowEdge[];
+  viewport: { x: number; y: number; zoom: number };
+} {
+  if (typeof obj !== "object" || obj === null) return false;
+
+  const candidate = obj as {
+    version?: unknown;
+    nodes?: unknown;
+    edges?: unknown;
+    viewport?: unknown;
+  };
+
+  // version must be a number
+  if (typeof candidate.version !== "number") return false;
+
+  // nodes must be a non-empty array
+  if (!Array.isArray(candidate.nodes) || candidate.nodes.length === 0)
+    return false;
+
+  // edges must be a non-empty array
+  if (!Array.isArray(candidate.edges) || candidate.edges.length === 0)
+    return false;
+
+  // viewport must be an object with x, y, zoom all numbers
+  if (typeof candidate.viewport !== "object" || candidate.viewport === null) {
+    return false;
+  }
+
+  const vp = candidate.viewport as Record<string, unknown>;
+  if (
+    typeof vp.x !== "number" ||
+    typeof vp.y !== "number" ||
+    typeof vp.zoom !== "number"
+  ) {
+    return false;
+  }
+
   return true;
 }
 
