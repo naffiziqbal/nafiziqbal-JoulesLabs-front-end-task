@@ -7,7 +7,7 @@ export default function RightBar({ selected }: { selected: Node | null }) {
     : null;
 
   return (
-    <div className="w-full bg-white p-3 space-y-3">
+    <div className="w-full bg-white p-3 space-y-3 z-10">
       <h4 className="font-bold text-lg"> Properties</h4>
       <div>
         {selectedProps ? (

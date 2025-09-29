@@ -7,6 +7,7 @@ import {
 import { toPng } from "html-to-image";
 import { useState } from "react";
 import { BsDownload } from "react-icons/bs";
+import { ToolTip } from "./tooltip";
 
 function downloadImage(dataUrl: string) {
   const a = document.createElement("a");
@@ -56,19 +57,12 @@ function DownloadButton() {
       <button
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="relative flex items-center text-white  py-2 px-3 bg-white/10 cursor-pointer rounded-xl rounded-s-none group hover:bg-white/20 transition-all duration-300"
+        className="text-white z-50 -translate-x-8"
         onClick={onClick}
       >
-        <BsDownload className="size-6  hover:text-blue-500 cursor-pointer" />
-        <span
-          className={`absolute right-full  bg-white/20 backdrop-blur-xl rounded-s-2xl   py-2 px-4 transition-all duration-300 text-nowrap transform ${
-            isHovered
-              ? "opacity-100 translate-x-0"
-              : "opacity-0 -translate-x-4 pointer-events-none"
-          }`}
-        >
-          Download As Png
-        </span>
+        <ToolTip text="Save As Png">
+          <BsDownload className="size-6  hover:text-blue-500 cursor-pointer" />
+        </ToolTip>
       </button>
     </Panel>
   );

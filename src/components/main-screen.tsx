@@ -3,6 +3,7 @@ import {
   Background,
   BackgroundVariant,
   Controls,
+  MiniMap,
   ReactFlow,
   useReactFlow,
   type Connection,
@@ -209,7 +210,7 @@ export default function MainScreen({
         defaultEdgeOptions={defaultEdgeOptions}
         className="download-image"
       >
-        <Controls />
+        <Controls position="top-left" />
         <Background />
         <DownloadButton />
         {editingNode && (
@@ -221,9 +222,7 @@ export default function MainScreen({
           />
         )}
         <Background variant={BackgroundVariant.Dots} bgColor="#212121" />
-        <Controls />
         <DownloadButton />
-        {/* <MiniMap /> */}
       </ReactFlow>
     </div>
   );
