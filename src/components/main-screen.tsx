@@ -4,21 +4,22 @@ import {
   BackgroundVariant,
   Controls,
   ReactFlow,
+  useReactFlow,
   type Connection,
   type Edge,
+  type EdgeChange,
   type Node,
   type NodeChange,
-  type EdgeChange,
   type ReactFlowInstance,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback, useRef, useState } from "react";
-import { NODE_TEMPLATES } from "../data/data";
+import React, { useCallback, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import useSaveToLocal from "../hooks/useSaveToLocal";
+import { NODE_TEMPLATES } from "../data/data";
+import useDeleteNode from "../hooks/useDeleteNode";
 import useLoadFromStorage from "../hooks/useLoadFromStorage";
 import useRestoreViewport from "../hooks/useRestoreViewport";
-import useDeleteNode from "../hooks/useDeleteNode";
+import useSaveToLocal from "../hooks/useSaveToLocal";
 import ConfigModal from "./edit-modal";
 
 export default function MainScreen({
@@ -31,20 +32,19 @@ export default function MainScreen({
   onNodesChange,
   onEdgesChange,
   rfInstance,
-  setRfInstance,
 }: {
   selected: Node | null;
   setSelected: (node: Node | null) => void;
   nodes: Node[];
-  setNodes: (nodes: Node[]) => void;
+  setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
   edges: Edge[];
-  setEdges: (edges: Edge[]) => void;
+  setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
   onNodesChange: (changes: NodeChange[]) => void;
   onEdgesChange: (changes: EdgeChange[]) => void;
   rfInstance: ReactFlowInstance | null;
-  setRfInstance: (rfInstance: ReactFlowInstance | null) => void;
 }) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const { screenToFlowPosition } = useReactFlow();
 
   const [editingNode, setEditingNode] = useState<Node | null>(null);
 
@@ -57,22 +57,15 @@ export default function MainScreen({
     (event: React.DragEvent) => {
       event.preventDefault();
       if (!wrapperRef.current) return;
-      console.log(nodes);
       const type = event.dataTransfer.getData("application/reactflow");
-      console.log(type);
       if (!type) return;
       const template = NODE_TEMPLATES.find((t) => t.type === type);
       const reactFlowBounds = wrapperRef.current.getBoundingClientRect();
 
-      const position = rfInstance
-        ? rfInstance.project({
-            x: event.clientX - reactFlowBounds.left,
-            y: event.clientY - reactFlowBounds.top,
-          })
-        : {
-            x: event.clientX - reactFlowBounds.left,
-            y: event.clientY - reactFlowBounds.top,
-          };
+      const position = screenToFlowPosition({
+        x: event.clientX - reactFlowBounds.left,
+        y: event.clientY - reactFlowBounds.top,
+      });
 
       const id = uuidv4();
       const newNode: Node = {
@@ -86,7 +79,7 @@ export default function MainScreen({
 
       setNodes((nds) => nds.concat(newNode));
     },
-    [rfInstance, setNodes]
+    [screenToFlowPosition, setNodes]
   );
 
   const onConnect = useCallback(
@@ -96,10 +89,13 @@ export default function MainScreen({
     },
     [edges, setEdges]
   );
-  const onNodeClick = useCallback((_: any, node: Node) => {
-    setSelected(node);
-  }, []);
-  const onNodeDoubleClick = useCallback((_: any, node: Node) => {
+  const onNodeClick = useCallback(
+    (_: React.MouseEvent, node: Node) => {
+      setSelected(node);
+    },
+    [setSelected]
+  );
+  const onNodeDoubleClick = useCallback((_: React.MouseEvent, node: Node) => {
     setEditingNode(node);
   }, []);
   const saveNodeConfig = useCallback(

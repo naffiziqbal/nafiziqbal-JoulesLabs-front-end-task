@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import MainScreen from "./components/main-screen";
 import RightBar from "./components/right-bar";
 import SideBar from "./components/side-bar";
@@ -8,6 +8,7 @@ import {
   type Edge,
   type Node,
   type ReactFlowInstance,
+  ReactFlowProvider,
 } from "@xyflow/react";
 import type { FlowState } from "./types/types";
 import {
@@ -27,7 +28,9 @@ export default function App() {
       version: 1,
       nodes: fromReactFlowNodes(nodes),
       edges: fromReactFlowEdges(edges),
-      viewport: rfInstance ? rfInstance.toObject().viewport : { x: 0, y: 0, zoom: 1 },
+      viewport: rfInstance
+        ? rfInstance.toObject().viewport
+        : { x: 0, y: 0, zoom: 1 },
     };
     const blob = new Blob([exportToJSON(flow)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -38,21 +41,26 @@ export default function App() {
     URL.revokeObjectURL(url);
   }, [nodes, edges, rfInstance]);
 
+  useEffect(() => {
+    setRfInstance(rfInstance);
+  }, [rfInstance]);
+
   return (
     <div className="grid grid-cols-[20%_60%_20%]">
       <SideBar handleExport={handleExport} />
-      <MainScreen
-        selected={selected}
-        setSelected={setSelected}
-        nodes={nodes}
-        setNodes={setNodes}
-        edges={edges}
-        setEdges={setEdges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        rfInstance={rfInstance}
-        setRfInstance={setRfInstance}
-      />
+      <ReactFlowProvider>
+        <MainScreen
+          selected={selected}
+          setSelected={setSelected}
+          nodes={nodes}
+          setNodes={setNodes}
+          edges={edges}
+          setEdges={setEdges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          rfInstance={rfInstance}
+        />
+      </ReactFlowProvider>
       <RightBar selected={selected} />
     </div>
   );

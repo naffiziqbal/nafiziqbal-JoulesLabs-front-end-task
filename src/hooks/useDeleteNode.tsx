@@ -10,8 +10,8 @@ export default function useDeleteNode({
 }: {
   selected: Node | null;
   editingNode: Node | null;
-  setNodes: (nodes: Node[]) => void;
-  setEdges: (edges: Edge[]) => void;
+  setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
+  setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
   setSelected: (node: Node | null) => void;
 }) {
   useEffect(() => {
@@ -33,5 +33,5 @@ export default function useDeleteNode({
       window.addEventListener("keydown", handler);
       return () => window.removeEventListener("keydown", handler);
     }
-  }, [selected, setNodes, setEdges, editingNode?.id]);
+  }, [selected, setNodes, setEdges, setSelected, editingNode?.id]);
 }

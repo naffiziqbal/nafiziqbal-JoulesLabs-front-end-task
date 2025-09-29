@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import type { FlowState } from "../types/types";
 import type { Edge, Node, ReactFlowInstance } from "@xyflow/react";
 import {
@@ -14,7 +14,7 @@ export default function useSaveToLocal({
 }: {
   nodes: Node[];
   edges: Edge[];
-  rfInstance: ReactFlowInstance;
+  rfInstance: ReactFlowInstance | null;
 }) {
   useEffect(() => {
     const id = setTimeout(() => {
@@ -22,7 +22,9 @@ export default function useSaveToLocal({
         version: 1,
         nodes: fromReactFlowNodes(nodes),
         edges: fromReactFlowEdges(edges),
-        viewport: rfInstance ? rfInstance.toObject() : { x: 0, y: 0, zoom: 1 },
+        viewport: rfInstance
+          ? rfInstance.toObject().viewport
+          : { x: 0, y: 0, zoom: 1 },
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(flow));
     }, 350);

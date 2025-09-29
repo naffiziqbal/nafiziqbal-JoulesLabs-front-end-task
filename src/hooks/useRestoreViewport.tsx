@@ -4,7 +4,7 @@ import { useEffect } from "react";
 export default function useRestoreViewport({
   rfInstance,
 }: {
-  rfInstance: ReactFlowInstance;
+  rfInstance: ReactFlowInstance | null;
 }) {
   useEffect(() => {
     const raw = sessionStorage.getItem("visual-workflow:viewport");
