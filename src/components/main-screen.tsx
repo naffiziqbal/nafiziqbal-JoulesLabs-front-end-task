@@ -69,30 +69,95 @@ export default function MainScreen({
   const { screenToFlowPosition } = useReactFlow();
 
   const [editingNode, setEditingNode] = useState<Node | null>(null);
+  // holds the last copied selection
+  const clipboardRef = useRef<{ nodes: Node[]; edges: Edge[] } | null>(null);
 
-  // keyboard shortcuts: Cmd+Z / Ctrl+Z for undo, Shift+Cmd+Z or Ctrl+Y for redo
-useEffect(() => {
+  // keyboard shortcuts: Undo/Redo and Copy/Paste
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const isMac = navigator.platform.toUpperCase().includes("MAC");
       const mod = isMac ? e.metaKey : e.ctrlKey;
-      if (!mod) return;
-      // Undo: Cmd+Z / Ctrl+Z without Shift
-      if (e.key.toLowerCase() === "z" && !e.shiftKey) {
-        e.preventDefault();
-        if (canUndo) undoNodes();
-      }
-      // Redo: Shift+Cmd+Z (Mac) or Ctrl+Y (Win/Linux)
-      if (
-        (isMac && e.key.toLowerCase() === "z" && e.shiftKey) ||
-        (!isMac && e.key.toLowerCase() === "y")
-      ) {
-        e.preventDefault();
-        if (canRedo) redoNodes();
+
+      // Handle copy without requiring mod for specific keys below
+      if (mod) {
+        // Undo: Cmd+Z / Ctrl+Z without Shift
+        if (e.key.toLowerCase() === "z" && !e.shiftKey) {
+          e.preventDefault();
+          if (canUndo) undoNodes();
+          return;
+        }
+        // Redo: Shift+Cmd+Z (Mac) or Ctrl+Y (Win/Linux)
+        if (
+          (isMac && e.key.toLowerCase() === "z" && e.shiftKey) ||
+          (!isMac && e.key.toLowerCase() === "y")
+        ) {
+          e.preventDefault();
+          if (canRedo) redoNodes();
+          return;
+        }
+
+        // Copy: Cmd/Ctrl + C
+        if (e.key.toLowerCase() === "c") {
+          const selectedNodes = nodes.filter((n) => n.selected);
+          if (selectedNodes.length === 0) return;
+          const selectedIds = new Set(selectedNodes.map((n) => n.id));
+          const innerEdges = edges.filter(
+            (ed) => selectedIds.has(ed.source) && selectedIds.has(ed.target)
+          );
+          clipboardRef.current = {
+            nodes: selectedNodes.map((n) => ({ ...n })),
+            edges: innerEdges.map((ed) => ({ ...ed })),
+          };
+          // also try to place text into system clipboard for cross-app safety
+          try {
+            const text = JSON.stringify(clipboardRef.current);
+            void navigator.clipboard.writeText(text).catch(() => undefined);
+          } catch {
+            // ignore clipboard access errors
+          }
+          return;
+        }
+
+        // Paste: Cmd/Ctrl + V
+        if (e.key.toLowerCase() === "v") {
+          e.preventDefault();
+          const clip = clipboardRef.current;
+          if (!clip || clip.nodes.length === 0) return;
+
+          // map old node ids to new ones
+          const idMap = new Map<string, string>();
+          clip.nodes.forEach((n) => idMap.set(n.id, uuidv4()));
+
+          // compute an offset so pasted group shifts visibly
+          const OFFSET = 32;
+
+          // clone nodes
+          const newNodes: Node[] = clip.nodes.map((n) => ({
+            ...n,
+            id: idMap.get(n.id) as string,
+            selected: true,
+            // shift position so pasted nodes don't overlap perfectly
+            position: { x: n.position.x + OFFSET, y: n.position.y + OFFSET },
+          }));
+
+          // clone edges inside selection
+          const newEdges: Edge[] = clip.edges.map((ed) => ({
+            ...ed,
+            id: uuidv4(),
+            source: idMap.get(ed.source) as string,
+            target: idMap.get(ed.target) as string,
+          }));
+
+          // add nodes with history first, then edges
+          newNodes.forEach((n) => addNodeWithHistory(n));
+          newEdges.forEach((ed) => addEdgeWithHistory(ed));
+          return;
+        }
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [undoNodes, redoNodes, canUndo, canRedo]);
+  }, [nodes, edges, canUndo, canRedo, undoNodes, redoNodes, addNodeWithHistory, addEdgeWithHistory]);
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
