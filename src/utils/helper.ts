@@ -4,12 +4,13 @@ import type { FlowEdge, FlowNode, FlowState, NodeType } from "../types/types";
 export const STORAGE_KEY = "visual-workflow:v1";
 
 export function fromReactFlowNodes(nodes: Node[]): FlowNode[] {
+  console.log(nodes);
   return nodes.map((n) => ({
     id: n.id,
-    type: (n.data?.userData?.type as NodeType) || "webhook",
+    type: (n.data?.userData as { type?: NodeType })?.type || "webhook",
     position: { x: n.position.x, y: n.position.y },
-    label: n.data?.label || "Node",
-    data: n.data?.userData || n.data || {},
+    label: (n.data?.label as string) || "Node",
+    data: (n.data?.userData || n.data || {}) as Record<string, unknown>,
   }));
 }
 
