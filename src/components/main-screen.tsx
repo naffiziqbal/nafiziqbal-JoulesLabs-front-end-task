@@ -33,6 +33,15 @@ export default function MainScreen({
   onNodesChange,
   onEdgesChange,
   rfInstance,
+  undoNodes,
+  redoNodes,
+  canUndo,
+  canRedo,
+  addNodeWithHistory,
+  deleteNodeWithHistory,
+  updateNodeWithHistory,
+  addEdgeWithHistory,
+  removeEdgeWithHistory,
 }: {
   selected: Node | null;
   setSelected: (node: Node | null) => void;
@@ -43,11 +52,41 @@ export default function MainScreen({
   onNodesChange: (changes: NodeChange[]) => void;
   onEdgesChange: (changes: EdgeChange[]) => void;
   rfInstance: ReactFlowInstance | null;
+  undoNodes: () => void;
+  redoNodes: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  addNodeWithHistory: (node: Node) => void;
+  deleteNodeWithHistory: (nodeId: string) => void;
+  updateNodeWithHistory: (nodeId: string, data: Record<string, unknown>) => void;
+  addEdgeWithHistory: (edge: Edge) => void;
+  removeEdgeWithHistory: (edgeId: string) => void;
 }) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const { screenToFlowPosition } = useReactFlow();
 
   const [editingNode, setEditingNode] = useState<Node | null>(null);
+
+  // keyboard shortcuts: Cmd+Z / Ctrl+Z for undo, Shift+Cmd+Z or Ctrl+Y for redo
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const isMac = navigator.platform.toUpperCase().includes("MAC");
+      const mod = isMac ? e.metaKey : e.ctrlKey;
+      if (!mod) return;
+      // Undo: Cmd+Z / Ctrl+Z without Shift
+      if (e.key.toLowerCase() === "z" && !e.shiftKey) {
+        e.preventDefault();
+        if (canUndo) undoNodes();
+      }
+      // Redo: Shift+Cmd+Z (Mac) or Ctrl+Y (Win/Linux)
+      if ((isMac && e.key.toLowerCase() === "z" && e.shiftKey) || (!isMac && e.key.toLowerCase() === "y")) {
+        e.preventDefault();
+        if (canRedo) redoNodes();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [undoNodes, redoNodes, canUndo, canRedo]);
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
@@ -78,17 +117,33 @@ export default function MainScreen({
         },
       };
 
-      setNodes((nds) => nds.concat(newNode));
+      addNodeWithHistory(newNode);
     },
-    [screenToFlowPosition, setNodes]
+    [screenToFlowPosition, addNodeWithHistory]
   );
 
   const onConnect = useCallback(
     (connection: Connection) => {
-      const edge = addEdge(connection as Edge, edges);
-      setEdges(edge as Edge[]);
+      const created = addEdge(connection as Edge, edges) as Edge[];
+      const newOnes = created.filter((e) => !edges.find((x) => x.id === e.id));
+      newOnes.forEach((e) => addEdgeWithHistory(e));
     },
-    [edges, setEdges]
+    [edges, addEdgeWithHistory]
+  );
+
+  const onEdgesChangeWrapped = useCallback(
+    (changes: EdgeChange[]) => {
+      // record edge removals into history
+      type RemoveChange = { type: "remove"; id: string };
+      changes.forEach((ch) => {
+        if ((ch as RemoveChange).type === "remove") {
+          const id = (ch as RemoveChange).id;
+          if (id) removeEdgeWithHistory(id);
+        }
+      });
+      onEdgesChange(changes);
+    },
+    [onEdgesChange, removeEdgeWithHistory]
   );
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
@@ -101,33 +156,17 @@ export default function MainScreen({
   }, []);
   const saveNodeConfig = useCallback(
     (nodeId: string, newData: Record<string, unknown>) => {
-      setNodes((nds) =>
-        nds.map((n) =>
-          n.id === nodeId
-            ? {
-                ...n,
-                data: {
-                  ...n.data,
-                  label: (newData.name as string) || n.data?.label,
-                  userData: { ...newData },
-                },
-              }
-            : n
-        )
-      );
+      updateNodeWithHistory(nodeId, newData);
       setEditingNode(null);
     },
-    [setNodes]
+    [updateNodeWithHistory]
   );
   const deleteNodeFromModal = useCallback(
     (nodeId: string) => {
-      setNodes((nds) => nds.filter((n) => n.id !== nodeId));
-      setEdges((es) =>
-        es.filter((e) => e.source !== nodeId && e.target !== nodeId)
-      );
+      deleteNodeWithHistory(nodeId);
       setEditingNode(null);
     },
-    [setNodes, setEdges]
+    [deleteNodeWithHistory]
   );
 
   useSaveToLocal({ nodes, edges, rfInstance });
@@ -154,7 +193,7 @@ export default function MainScreen({
         onNodesChange={onNodesChange}
         onNodeClick={onNodeClick}
         onNodeDoubleClick={onNodeDoubleClick}
-        onEdgesChange={onEdgesChange}
+        onEdgesChange={onEdgesChangeWrapped}
         onConnect={onConnect}
         connectionLineStyle={connectionLineStyle}
         snapToGrid={true}
@@ -167,6 +206,27 @@ export default function MainScreen({
         <Controls />
         <Background />
         <DownloadButton />
+        {/* Undo/Redo small toolbar */}
+        <div
+          style={{ position: "absolute", top: 12, right: 12, display: "flex", gap: 8, zIndex: 10 }}
+        >
+          <button
+            className="bg-gray-200 px-2 py-1 rounded disabled:opacity-50"
+            onClick={undoNodes}
+            disabled={!canUndo}
+            title="Undo (Cmd/Ctrl+Z)"
+          >
+            Undo
+          </button>
+          <button
+            className="bg-gray-200 px-2 py-1 rounded disabled:opacity-50"
+            onClick={redoNodes}
+            disabled={!canRedo}
+            title="Redo (Shift+Cmd+Z or Ctrl+Y)"
+          >
+            Redo
+          </button>
+        </div>
         {editingNode && (
           <ConfigModal
             node={editingNode}

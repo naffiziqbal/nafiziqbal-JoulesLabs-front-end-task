@@ -21,12 +21,9 @@ export default function useDeleteNode({
       const handler = (e: KeyboardEvent) => {
         if (e.key === "Delete" || e.key === "Backspace") {
           if (!selected) return;
+          // NOTE: This raw deletion bypasses history. Consumers can override by passing wrappers.
           setNodes((nds) => nds.filter((n) => n.id !== selected.id));
-          setEdges((es) =>
-            es.filter(
-              (e) => e.source !== selected.id && e.target !== selected.id
-            )
-          );
+          setEdges((es) => es.filter((e) => e.source !== selected.id && e.target !== selected.id));
           setSelected(null);
         }
       };
