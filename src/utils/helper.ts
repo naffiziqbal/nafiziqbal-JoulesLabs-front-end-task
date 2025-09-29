@@ -40,13 +40,11 @@ export function validateImported(obj: unknown): obj is {
   // version must be a number
   if (typeof candidate.version !== "number") return false;
 
-  // nodes must be a non-empty array
-  if (!Array.isArray(candidate.nodes) || candidate.nodes.length === 0)
-    return false;
+  // nodes must be an array (can be empty)
+  if (!Array.isArray(candidate.nodes)) return false;
 
-  // edges must be a non-empty array
-  if (!Array.isArray(candidate.edges) || candidate.edges.length === 0)
-    return false;
+  // edges must be an array (can be empty)
+  if (!Array.isArray(candidate.edges)) return false;
 
   // viewport must be an object with x, y, zoom all numbers
   if (typeof candidate.viewport !== "object" || candidate.viewport === null) {
