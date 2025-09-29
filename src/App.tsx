@@ -12,7 +12,7 @@ import {
   type ReactFlowInstance,
   ReactFlowProvider,
 } from "@xyflow/react";
-import type { FlowState } from "./types/types";
+import type { FlowState, HistoryAction } from "./types/types";
 import {
   exportToJSON,
   fromReactFlowEdges,
@@ -27,19 +27,6 @@ export default function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState([] as Node[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([] as Edge[]);
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
-  type HistoryAction =
-    | { type: "addNode"; node: Node }
-    | { type: "deleteNode"; node: Node; edges: Edge[] }
-    | {
-        type: "updateNode";
-        id: string;
-        prevData: Record<string, unknown> | undefined;
-        nextData: Record<string, unknown> | undefined;
-        prevLabel?: string | undefined;
-        nextLabel?: string | undefined;
-      }
-    | { type: "addEdge"; edge: Edge }
-    | { type: "removeEdge"; edge: Edge };
 
   const [undoStack, setUndoStack] = useState<HistoryAction[]>([]);
   const [redoStack, setRedoStack] = useState<HistoryAction[]>([]);
@@ -98,7 +85,7 @@ export default function App() {
   const addNodeWithHistory = useCallback(
     (node: Node) => {
       setNodes((nds) => nds.concat(node));
-      commit({ type: "addNode", node });
+      commit({ type: "addNode", node: node as Node });
     },
     [commit, setNodes]
   );
@@ -295,7 +282,7 @@ export default function App() {
   }, [rfInstance]);
 
   return (
-    <div className="grid grid-cols-[20%_60%_20%]">
+    <div className="grid grid-cols-[20%_60%_20%] bg-black">
       <SideBar
         fileRef={fileRef}
         handleFile={handleFile}

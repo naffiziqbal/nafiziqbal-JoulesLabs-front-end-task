@@ -19,7 +19,7 @@ export default function SideBar({
   handleFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
-    <div className="bg-white p-3 space-y-4 grid grid-rows-[auto_1fr_auto]">
+    <div className="bg-white  p-3 space-y-4 grid grid-rows-[auto_1fr_auto]">
       <div className="flex justify-between items-center">
         <h4 className="font-bold text-lg">Nodes</h4>
         <div className=" flex justify-end  items-end  gap-3  *:py-2 *:rounded px-4 py-2 rounded *:cursor-pointer">

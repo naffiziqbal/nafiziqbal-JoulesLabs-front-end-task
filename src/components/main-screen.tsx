@@ -3,7 +3,6 @@ import {
   Background,
   BackgroundVariant,
   Controls,
-  MiniMap,
   ReactFlow,
   useReactFlow,
   type Connection,
@@ -14,7 +13,7 @@ import {
   type ReactFlowInstance,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { NODE_TEMPLATES } from "../data/data";
 import useDeleteNode from "../hooks/useDeleteNode";
@@ -72,7 +71,7 @@ export default function MainScreen({
   const [editingNode, setEditingNode] = useState<Node | null>(null);
 
   // keyboard shortcuts: Cmd+Z / Ctrl+Z for undo, Shift+Cmd+Z or Ctrl+Y for redo
-  React.useEffect(() => {
+useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const isMac = navigator.platform.toUpperCase().includes("MAC");
       const mod = isMac ? e.metaKey : e.ctrlKey;
@@ -204,6 +203,7 @@ export default function MainScreen({
         onConnect={onConnect}
         connectionLineStyle={connectionLineStyle}
         snapToGrid={true}
+        colorMode="dark"
         defaultViewport={defaultViewport}
         fitView
         attributionPosition="bottom-left"
