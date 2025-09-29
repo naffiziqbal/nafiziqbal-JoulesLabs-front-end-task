@@ -26,6 +26,15 @@ export default function RightBar({ selected }: { selected: Node | null }) {
           </p>
         )}
       </div>
+      <div className="pt-2 border-t absolute bottom-10">
+        <h5 className="font-semibold text-sm mb-1">Shortcuts</h5>
+        <ul className="text-xs text-gray-700 space-y-1 list-disc pl-4">
+          <li>Copy selection: Cmd/Ctrl + C</li>
+          <li>Paste selection: Cmd/Ctrl + V</li>
+          <li>Undo: Cmd/Ctrl + Z</li>
+          <li>Redo: Shift+Cmd+Z (Mac) or Ctrl+Y (Win/Linux)</li>
+        </ul>
+      </div>
     </div>
   );
 }
