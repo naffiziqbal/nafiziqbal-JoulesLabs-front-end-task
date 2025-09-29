@@ -21,6 +21,8 @@ import useLoadFromStorage from "../hooks/useLoadFromStorage";
 import useRestoreViewport from "../hooks/useRestoreViewport";
 import useSaveToLocal from "../hooks/useSaveToLocal";
 import ConfigModal from "./edit-modal";
+import DownloadButton from "./download-btn";
+import CustomNode from "./custom-node";
 
 export default function MainScreen({
   selected,
@@ -134,6 +136,12 @@ export default function MainScreen({
   useRestoreViewport({ rfInstance });
   useDeleteNode({ selected, setNodes, setEdges, setSelected, editingNode });
 
+  const connectionLineStyle = { stroke: "#ffff" };
+  const defaultEdgeOptions = {
+    animated: true,
+    type: "smoothstep",
+  };
+  const defaultViewport = { x: 0, y: 0, zoom: 0.5 };
   return (
     <div
       style={{ width: "100%", height: "100vh" }}
@@ -146,11 +154,19 @@ export default function MainScreen({
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onNodeDoubleClick={onNodeDoubleClick}
         onConnect={onConnect}
-        onNodeClick={onNodeClick}
+        connectionLineStyle={connectionLineStyle}
+        connectionLineType="smoothstep"
+        snapToGrid={true}
+        defaultViewport={defaultViewport}
         fitView
+        attributionPosition="bottom-left"
+        defaultEdgeOptions={defaultEdgeOptions}
+        className="download-image"
       >
+        <Controls />
+        <Background />
+        <DownloadButton />
         {editingNode && (
           <ConfigModal
             node={editingNode}
@@ -161,6 +177,7 @@ export default function MainScreen({
         )}
         <Background variant={BackgroundVariant.Dots} bgColor="#212121" />
         <Controls />
+        <DownloadButton />
         {/* <MiniMap /> */}
       </ReactFlow>
     </div>

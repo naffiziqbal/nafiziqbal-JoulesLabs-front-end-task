@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import MainScreen from "./components/main-screen";
 import RightBar from "./components/right-bar";
 import SideBar from "./components/side-bar";
+import "@xyflow/react/dist/style.css";
+
 import {
   useEdgesState,
   useNodesState,
