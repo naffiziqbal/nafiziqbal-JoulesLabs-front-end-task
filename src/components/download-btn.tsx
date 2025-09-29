@@ -5,7 +5,6 @@ import {
   useReactFlow,
 } from "@xyflow/react";
 import { toPng } from "html-to-image";
-import { useState } from "react";
 import { BsDownload } from "react-icons/bs";
 import { ToolTip } from "./tooltip";
 
@@ -20,7 +19,6 @@ const imageWidth = 1920;
 const imageHeight = 768;
 
 function DownloadButton() {
-  const [isHovered, setIsHovered] = useState(false);
   const { getNodes } = useReactFlow();
   const onClick = () => {
     // we calculate a transform for the nodes so that all nodes are visible
@@ -54,12 +52,7 @@ function DownloadButton() {
 
   return (
     <Panel position="top-right">
-      <button
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        className="text-white z-50 -translate-x-8"
-        onClick={onClick}
-      >
+      <button className="text-white z-50 -translate-x-8" onClick={onClick}>
         <ToolTip text="Save As Png">
           <BsDownload className="size-6  hover:text-blue-500 cursor-pointer" />
         </ToolTip>
