@@ -13,7 +13,7 @@ function downloadImage(dataUrl: string) {
   a.click();
 }
 
-const imageWidth = 1024;
+const imageWidth = 1920;
 const imageHeight = 768;
 
 function DownloadButton() {
@@ -27,12 +27,13 @@ function DownloadButton() {
       nodesBounds,
       imageWidth,
       imageHeight,
-      0.5,
-      2
+      1,
+      5,
+      1
     );
 
     toPng(document.querySelector(".react-flow__viewport"), {
-      backgroundColor: "#1a365d",
+      backgroundColor: "",
       width: imageWidth,
       height: imageHeight,
       style: {

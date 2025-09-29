@@ -20,9 +20,8 @@ import useDeleteNode from "../hooks/useDeleteNode";
 import useLoadFromStorage from "../hooks/useLoadFromStorage";
 import useRestoreViewport from "../hooks/useRestoreViewport";
 import useSaveToLocal from "../hooks/useSaveToLocal";
-import ConfigModal from "./edit-modal";
 import DownloadButton from "./download-btn";
-import CustomNode from "./custom-node";
+import ConfigModal from "./edit-modal";
 
 export default function MainScreen({
   selected,
@@ -153,10 +152,11 @@ export default function MainScreen({
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
+        onNodeClick={onNodeClick}
+        onNodeDoubleClick={onNodeDoubleClick}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         connectionLineStyle={connectionLineStyle}
-        connectionLineType="smoothstep"
         snapToGrid={true}
         defaultViewport={defaultViewport}
         fitView
