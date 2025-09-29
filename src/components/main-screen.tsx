@@ -58,7 +58,10 @@ export default function MainScreen({
   canRedo: boolean;
   addNodeWithHistory: (node: Node) => void;
   deleteNodeWithHistory: (nodeId: string) => void;
-  updateNodeWithHistory: (nodeId: string, data: Record<string, unknown>) => void;
+  updateNodeWithHistory: (
+    nodeId: string,
+    data: Record<string, unknown>
+  ) => void;
   addEdgeWithHistory: (edge: Edge) => void;
   removeEdgeWithHistory: (edgeId: string) => void;
 }) {
@@ -79,7 +82,10 @@ export default function MainScreen({
         if (canUndo) undoNodes();
       }
       // Redo: Shift+Cmd+Z (Mac) or Ctrl+Y (Win/Linux)
-      if ((isMac && e.key.toLowerCase() === "z" && e.shiftKey) || (!isMac && e.key.toLowerCase() === "y")) {
+      if (
+        (isMac && e.key.toLowerCase() === "z" && e.shiftKey) ||
+        (!isMac && e.key.toLowerCase() === "y")
+      ) {
         e.preventDefault();
         if (canRedo) redoNodes();
       }
@@ -206,27 +212,6 @@ export default function MainScreen({
         <Controls />
         <Background />
         <DownloadButton />
-        {/* Undo/Redo small toolbar */}
-        <div
-          style={{ position: "absolute", top: 12, right: 12, display: "flex", gap: 8, zIndex: 10 }}
-        >
-          <button
-            className="bg-gray-200 px-2 py-1 rounded disabled:opacity-50"
-            onClick={undoNodes}
-            disabled={!canUndo}
-            title="Undo (Cmd/Ctrl+Z)"
-          >
-            Undo
-          </button>
-          <button
-            className="bg-gray-200 px-2 py-1 rounded disabled:opacity-50"
-            onClick={redoNodes}
-            disabled={!canRedo}
-            title="Redo (Shift+Cmd+Z or Ctrl+Y)"
-          >
-            Redo
-          </button>
-        </div>
         {editingNode && (
           <ConfigModal
             node={editingNode}
