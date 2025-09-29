@@ -32,13 +32,17 @@ function DownloadButton() {
       1
     );
 
-    toPng(document.querySelector(".react-flow__viewport"), {
+    const viewportEl = document.querySelector(
+      ".react-flow__viewport"
+    ) as HTMLElement | null;
+    if (!viewportEl) return;
+    toPng(viewportEl, {
       backgroundColor: "",
       width: imageWidth,
       height: imageHeight,
       style: {
-        width: imageWidth,
-        height: imageHeight,
+        width: `${imageWidth}px`,
+        height: `${imageHeight}px`,
         transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
       },
     }).then(downloadImage);
