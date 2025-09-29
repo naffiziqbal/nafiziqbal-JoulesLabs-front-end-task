@@ -33,7 +33,7 @@ export default function App() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "flow.json";
+    a.download = `flow-${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
   }, [nodes, edges, rfInstance]);
